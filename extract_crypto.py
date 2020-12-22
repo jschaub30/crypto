@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 
-import requests
+import sys
 from datetime import datetime
+import requests
 
 ts_start = int(datetime(2019, 7, 31).timestamp())
 ts_end = int(datetime.today().timestamp())
 
-coins = ["bitcoin", "bitcoin-cash", "ethereum", "ripple", "litecoin", "filecoin"]
+coins = ["bitcoin", "bitcoin-cash", "ethereum", "ripple", "litecoin", "origin-protocol", "filecoin", "zcash"]
 all = {}
 for coin in coins:
-    print(f"Getting prices for {coin}")
+    sys.stderr.write(f"Getting prices for {coin}\n")
     url = "https://web-api.coinmarketcap.com/v1/cryptocurrency/ohlcv/historical?convert=USD"
     url += f"&slug={coin}"
     url += f"&time_end={ts_end}"
@@ -26,14 +27,15 @@ for coin in coins:
             datestr = ts.strftime('%Y-%m-%d')
             all.setdefault(datestr, {})
             all[datestr][coin] =  price
-            print(f"{ts.strftime('%Y-%m-%d')}	{price}")
+            sys.stderr.write(f"{ts.strftime('%Y-%m-%d')}	{price}\n")
 
 #print(all)
 
-rows =  ["date," + ','.join(coins)]
+rows =  ["date\t" + '\t'.join(coins)]
 for ts, prices in all.items():
-    row = f"{ts},"
-    row += ",".join([str(val) for _, val in prices.items()])
+    row = f"{ts}\t"
+    row += "\t".join([str(val) for _, val in prices.items()])
     rows.append(row)
 
 print('\n'.join(rows))
+sys.stderr.write("Done\n")
